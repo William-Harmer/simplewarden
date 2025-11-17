@@ -1,7 +1,7 @@
 # SimpleWarden
 > **Status:** Ongoing - project just started.
 
-SimpleWarden combines [Bitwarden](https://bitwarden.com/) and [SimpleLogin](https://simplelogin.io/) to ensure that email aliases stored on both platforms are always always synced across both services.
+SimpleWarden combines [Bitwarden](https://bitwarden.com/) and [SimpleLogin](https://simplelogin.io/) to ensure that email aliases stored on both platforms are always synced across both services.
 
 ## Upcoming Features
 - **Alias Syncing:** Automatically compare and sync email aliases between Bitwarden and SimpleLogin.
