@@ -1,10 +1,8 @@
-
-
 import json
 import pprint
 import subprocess
 
-from bw_auth import bw_lock, bw_login, bw_logout, bw_unlock
+from bw_auth import bw_get_status, bw_lock, bw_login, bw_logout, bw_unlock
 from config import BW_CLI
 from env import get_sl_api_key, load_and_validate_env
 
@@ -64,7 +62,6 @@ def interactive_console():
 def main():
     load_and_validate_env()
     SL_API_KEY = get_sl_api_key()
-    
     interactive_console()
 
 if __name__ == "__main__":
