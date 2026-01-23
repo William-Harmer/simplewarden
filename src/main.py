@@ -1,12 +1,15 @@
-# main.py
+
+
 import json
 import pprint
 import subprocess
-from dotenv import load_dotenv
-from config import BW_CLI
-from bw_auth import bw_login, bw_logout, bw_unlock, bw_lock
 
-def list_items():
+from bw_auth import bw_lock, bw_login, bw_logout, bw_unlock
+from config import BW_CLI
+from env import get_sl_api_key, load_and_validate_env
+
+
+def bw_list_items():
     result = subprocess.run(
         [BW_CLI, "list", "items"],
         text=True,
@@ -49,7 +52,7 @@ def interactive_console():
         if user_input == "logout":
             break
         elif user_input == "list":
-            list_items()
+            bw_list_items()
         elif user_input == "":
             continue
         else:
@@ -59,7 +62,9 @@ def interactive_console():
     bw_logout()
 
 def main():
-    load_dotenv()
+    load_and_validate_env()
+    SL_API_KEY = get_sl_api_key()
+    
     interactive_console()
 
 if __name__ == "__main__":
