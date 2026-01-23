@@ -19,13 +19,13 @@ def logout():
         subprocess.run([BW_CLI, "logout"], check=True)
 
 def login():
+    # Make some checks to ensure the apikeys are here?? Or maybe make sure there is a check earlier
     if get_status() == "unauthenticated":
         subprocess.run([BW_CLI, "login", "--apikey"], check=True)
     else:
         print("You are already logged in.")
 
 
-# Need to understand what is happening here
 def unlock():
     status = get_status()
     
@@ -39,14 +39,13 @@ def unlock():
 
         result = subprocess.run(
             [BW_CLI, "unlock", "--raw"], # --raw allows only the session key to be outputted to console
-            text=True, # treat the subprocess input/output as text (strings), not bytes.
+            text = True, # treat the subprocess input/output as text (strings), not bytes.
 
             # Do not print the output to the console (Which is the raw session key), instead store the console output in result.stdout
-            # We can't use capture_output here because otherwise it also captures stderr whihc is where bitwarden prints its password prompt to stderr
+            # We can't use capture_output here because otherwise it also captures stderr which is where bitwarden prints its password prompt for the user to input
             stdout=subprocess.PIPE,
 
-
-            check=True
+            check=True # If its exit code is non-zero, raise an exception.
         ) 
         session = result.stdout
         os.environ["BW_SESSION"] = session
