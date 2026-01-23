@@ -1,5 +1,6 @@
 import json
 import os
+import pprint
 import subprocess
 from config import BW_CLI
 from dotenv import load_dotenv
@@ -47,9 +48,8 @@ def unlock():
 
             check=True # If its exit code is non-zero, raise an exception.
         ) 
-        session = result.stdout
-        os.environ["BW_SESSION"] = session
-        print("Vault unlocked (session stored).")
+        os.environ["BW_SESSION"] = result.stdout
+        print("Vault unlocked.")
 
 
 def lock():
@@ -61,17 +61,31 @@ def lock():
     elif status == "unlocked":
         subprocess.run([BW_CLI, "lock"], check=True)
 
+def list():
+    result = subprocess.run(
+        [BW_CLI, "list", "items"],
+        text=True,
+        capture_output=True,
+        check=True
+    )
 
+    items = json.loads(result.stdout)
+
+    for item in items:
+        login = item.get("login", {})
+
+        output = {
+            "username": login.get("username"),
+            "uris": login.get("uris"),
+            "password": login.get("password"),
+        }
+
+        pprint.pprint(output)
+        print("-" * 40)
 
 def interactive_console():
-    print("\n\n")
-    print(get_status())
     login()
-    print("\n\n")
-    print(get_status())
     unlock()
-    print("\n\n")
-    print(get_status())
 
     print("Interactive mode started.")
     print("Type 'logout' to log out and exit.")
@@ -82,8 +96,11 @@ def interactive_console():
         except (KeyboardInterrupt, EOFError):
             print("\nExiting...")
             break
+        
         if user_input == "logout":
             break
+        elif user_input == "list":
+            list()
         elif user_input == "":
             continue
         else:
@@ -94,7 +111,7 @@ def interactive_console():
         
 def main():
     # Check that the .env variables have been loaded
-    # Need to write a proper error check for these
+    # Need to write a proper error check function for these
     load_dotenv()
     print("BW_CLIENTID set:", bool(os.getenv("BW_CLIENTID")))
     print("BW_CLIENTSECRET set:", bool(os.getenv("BW_CLIENTSECRET")))
