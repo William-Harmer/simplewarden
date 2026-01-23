@@ -4,7 +4,7 @@ import pprint
 import subprocess
 from dotenv import load_dotenv
 from config import BW_CLI
-from bw_auth import login, logout, unlock, lock  # <-- import from other file
+from bw_auth import bw_login, bw_logout, bw_unlock, bw_lock
 
 def list_items():
     result = subprocess.run(
@@ -33,8 +33,8 @@ def list_items():
         print("-" * 40)
 
 def interactive_console():
-    login()
-    unlock()
+    bw_login()
+    bw_unlock()
 
     print("Interactive mode started.")
     print("Type 'logout' to log out and exit.")
@@ -55,8 +55,8 @@ def interactive_console():
         else:
             print(f"Unknown command: {user_input}")
 
-    lock()
-    logout()
+    bw_lock()
+    bw_logout()
 
 def main():
     load_dotenv()

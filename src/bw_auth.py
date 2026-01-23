@@ -8,19 +8,19 @@ def get_status() -> str:
     result = subprocess.run([BW_CLI, "status"], text=True, capture_output=True, check=True)
     return json.loads(result.stdout)["status"]  # unauthenticated | locked | unlocked
 
-def logout() -> None:
+def bw_logout() -> None:
     if get_status() == "unauthenticated":
         print("Already logged out")
     else:
         subprocess.run([BW_CLI, "logout"], check=True)
 
-def login() -> None:
+def bw_login() -> None:
     if get_status() == "unauthenticated":
         subprocess.run([BW_CLI, "login", "--apikey"], check=True)
     else:
         print("You are already logged in.")
 
-def unlock() -> None:
+def bw_unlock() -> None:
     status = get_status()
 
     if status == "unauthenticated":
@@ -41,7 +41,7 @@ def unlock() -> None:
     os.environ["BW_SESSION"] = result.stdout.strip()
     print("Vault unlocked.")
 
-def lock() -> None:
+def bw_lock() -> None:
     status = get_status()
     if status == "unauthenticated":
         print("You are not logged in and so you cannot lock your vault.")
