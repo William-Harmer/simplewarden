@@ -41,11 +41,7 @@ def interactive_console():
     print("Type 'logout' to log out and exit.")
 
     while True:
-        try:
-            user_input = input("> ").strip().lower()
-        except (KeyboardInterrupt, EOFError):
-            print("\nExiting...")
-            break
+        user_input = input("> ").strip().lower()
 
         if user_input == "logout":
             break
@@ -56,13 +52,31 @@ def interactive_console():
         else:
             print(f"Unknown command: {user_input}")
 
-    bw_lock()
-    bw_logout()
-
 def main():
     load_and_validate_env()
     SL_API_KEY = get_sl_api_key()
     interactive_console()
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nInterrupted.")
+    finally:
+        lock_err = None
+        logout_err = None
+
+        try:
+            bw_lock()
+        except Exception as e:
+            lock_err = e
+
+        try:
+            bw_logout()
+        except Exception as e:
+            logout_err = e
+
+        if lock_err:
+            print(f"Cleanup: lock failed: {lock_err}")
+        if logout_err:
+            print(f"Cleanup: logout failed: {logout_err}")
