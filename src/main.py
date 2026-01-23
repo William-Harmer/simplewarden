@@ -38,13 +38,17 @@ def unlock():
     elif status == "locked":
 
         result = subprocess.run(
-            [BW_CLI, "unlock", "--raw"],
-            text=True,
-            stdout=subprocess.PIPE,   # capture token
-            stderr=None,              # let prompt/errors show in terminal
+            [BW_CLI, "unlock", "--raw"], # --raw allows only the session key to be outputted to console
+            text=True, # treat the subprocess input/output as text (strings), not bytes.
+
+            # Do not print the output to the console (Which is the raw session key), instead store the console output in result.stdout
+            # We can't use capture_output here because otherwise it also captures stderr whihc is where bitwarden prints its password prompt to stderr
+            stdout=subprocess.PIPE,
+
+
             check=True
-        )
-        session = result.stdout.strip()
+        ) 
+        session = result.stdout
         os.environ["BW_SESSION"] = session
         print("Vault unlocked (session stored).")
 
