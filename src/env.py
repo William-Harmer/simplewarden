@@ -1,11 +1,11 @@
 import os
 from dotenv import dotenv_values, load_dotenv
 
-_env_initialized = False
+env_loaded_and_validated = False
 
 
 def load_and_validate_env() -> None:
-    global _env_initialized
+    global env_loaded_and_validated
 
     load_dotenv()
     values = dotenv_values()
@@ -20,11 +20,11 @@ def load_and_validate_env() -> None:
             + ", ".join(missing)
         )
 
-    _env_initialized = True
+    env_loaded_and_validated = True
 
 
 def get_sl_api_key() -> str:
-    if not _env_initialized:
+    if not env_loaded_and_validated:
         raise RuntimeError(
             "Environment not initialized. "
             "Call load_and_validate_env() first."
