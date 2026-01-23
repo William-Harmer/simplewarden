@@ -61,7 +61,7 @@ def lock():
     elif status == "unlocked":
         subprocess.run([BW_CLI, "lock"], check=True)
 
-def list():
+def list_items():
     result = subprocess.run(
         [BW_CLI, "list", "items"],
         text=True,
@@ -71,10 +71,14 @@ def list():
 
     items = json.loads(result.stdout)
 
-    for item in items:
-        login = item.get("login", {})
+    print(f"Total items: {len(items)}")
+    print("=" * 40)
+
+    for i, item in enumerate(items, start=1):
+        login = item.get("login", {}) or {}
 
         output = {
+            "index": i,
             "username": login.get("username"),
             "uris": login.get("uris"),
             "password": login.get("password"),
@@ -100,7 +104,7 @@ def interactive_console():
         if user_input == "logout":
             break
         elif user_input == "list":
-            list()
+            list_items()
         elif user_input == "":
             continue
         else:
