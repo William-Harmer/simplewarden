@@ -2,7 +2,7 @@ import json
 import pprint
 import subprocess
 import requests
-from SLCient import SLClient
+from SLClient import SLClient
 from bw_auth import bw_get_status, bw_lock, bw_login, bw_logout, bw_unlock
 from config import BW_CLI
 from env import get_sl_api_key, load_and_validate_env
