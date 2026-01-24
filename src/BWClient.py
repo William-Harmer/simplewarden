@@ -57,7 +57,7 @@ class BWClient:
         else:
             subprocess.run([BW_CLI, "lock"], check=True)
 
-    def create_list_of_logins():
+    def create_list_of_logins(self):
         _result = subprocess.run(
             [BW_CLI, "list", "items"],
             text=True,

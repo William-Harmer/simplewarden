@@ -1,37 +1,12 @@
-import json
-import subprocess
 from SLClient import SLClient
-from bw_auth import bw_get_status, bw_lock, bw_login, bw_logout, bw_unlock
-from config import BW_CLI
-from env import get_sl_api_key, load_and_validate_env
+from BWClient import BWClient
+from env import get_sl_api_key
 
-
-def create_list_of_logins():
-    result = subprocess.run(
-        [BW_CLI, "list", "items"],
-        text=True,
-        capture_output=True,
-        check=True
-    )
-
-    items = json.loads(result.stdout)
-
-    results = []
-
-    for item in items:
-        login = item.get("login") or {}
-
-        results.append({
-            "username": login.get("username"),
-            "uris": login.get("uris"),
-            "password": login.get("password"),
-        })
-
-    return results
 
 def interactive_console():
-    bw_login()
-    bw_unlock()
+    bw_client = BWClient()
+    bw_client.login()
+    bw_client.unlock()
     sl_client = SLClient()
 
     print("Interactive mode started.")
@@ -50,7 +25,7 @@ def interactive_console():
                 print(email)
             sl_client.clear_emails()
         elif user_input == "bwlist":
-            logins = create_list_of_logins()
+            logins = bw_client.create_list_of_logins()
             for login in logins:
                 print("-" * 40)
                 for value in login.values():
@@ -58,26 +33,27 @@ def interactive_console():
         else:
             print(f"Unknown command: {user_input}")
 
+    return bw_client
+
+
 def main():
-    load_and_validate_env()
-    interactive_console()
+    return interactive_console()
+
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\nInterrupted.")
-    finally:
+    bw_client = main()
+
+    if bw_client:
         lock_err = None
         logout_err = None
 
         try:
-            bw_lock()
+            bw_client.lock()
         except Exception as e:
             lock_err = e
 
         try:
-            bw_logout()
+            bw_client.logout()
         except Exception as e:
             logout_err = e
 
