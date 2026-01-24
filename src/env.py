@@ -34,4 +34,4 @@ def get_sl_api_key() -> str:
     if not value:
         raise RuntimeError("SL_APIKEY not available after validation")
 
-    return value.strip()
+    return value

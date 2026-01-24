@@ -1,15 +1,14 @@
 import json
 import pprint
 import subprocess
-
 import requests
-
+from SLCient import SLClient
 from bw_auth import bw_get_status, bw_lock, bw_login, bw_logout, bw_unlock
 from config import BW_CLI
 from env import get_sl_api_key, load_and_validate_env
 
 
-def bw_list_items():
+def create_list_of_logins():
     result = subprocess.run(
         [BW_CLI, "list", "items"],
         text=True,
@@ -19,49 +18,23 @@ def bw_list_items():
 
     items = json.loads(result.stdout)
 
-    print(f"Total items: {len(items)}")
-    print("=" * 40)
+    results = []
 
-    for i, item in enumerate(items, start=1):
-        login_obj = item.get("login", {}) or {}
+    for item in items:
+        login = item.get("login") or {}
 
-        output = {
-            "index": i,
-            "username": login_obj.get("username"),
-            "uris": login_obj.get("uris"),
-            "password": login_obj.get("password"),
-        }
+        results.append({
+            "username": login.get("username"),
+            "uris": login.get("uris"),
+            "password": login.get("password"),
+        })
 
-        pprint.pprint(output)
-        print("-" * 40)
+    return results
 
-def create_list_of_alias_emails(SL_APIKEY: str) -> list[str]:
-    emails = []
-    page = 0
-
-    while True:
-        resp = requests.get(
-            "https://app.simplelogin.io/api/v2/aliases",
-            headers={"Authentication": SL_APIKEY},
-            params={"page_id": page},
-            timeout=30,
-        )
-        resp.raise_for_status()
-
-        aliases = resp.json()["aliases"]
-        if not aliases:
-            break
-
-        for alias in aliases:
-            emails.append(alias["email"])
-
-        page += 1
-
-    return emails
-
-def interactive_console(SL_APIKEY: str):
+def interactive_console():
     bw_login()
     bw_unlock()
+    sl_client = SLClient()
 
     print("Interactive mode started.")
     print("Type 'logout' to log out and exit.")
@@ -71,21 +44,25 @@ def interactive_console(SL_APIKEY: str):
 
         if user_input == "logout":
             break
-        elif user_input == "sllist":
-            emails = create_list_of_alias_emails(SL_APIKEY)
-            for email in emails:
-                print(email)
-        elif user_input == "bwlist":
-            bw_list_items()
         elif user_input == "":
             continue
+        elif user_input == "sllist":
+            sl_client.create_list_of_alias_emails()
+            for email in sl_client.emails:
+                print(email)
+            sl_client.clear_emails()
+        elif user_input == "bwlist":
+            logins = create_list_of_logins()
+            for login in logins:
+                print("-" * 40)
+                for value in login.values():
+                    print(value)
         else:
             print(f"Unknown command: {user_input}")
 
 def main():
     load_and_validate_env()
-    SL_APIKEY = get_sl_api_key()
-    interactive_console(SL_APIKEY)
+    interactive_console()
 
 if __name__ == "__main__":
     try:
