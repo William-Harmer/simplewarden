@@ -1,7 +1,5 @@
 import json
-import pprint
 import subprocess
-import requests
 from SLClient import SLClient
 from bw_auth import bw_get_status, bw_lock, bw_login, bw_logout, bw_unlock
 from config import BW_CLI
