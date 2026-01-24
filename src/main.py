@@ -3,10 +3,7 @@ from BWClient import BWClient
 from env import get_sl_api_key
 
 
-def interactive_console():
-    bw_client = BWClient()
-    bw_client.login()
-    bw_client.unlock()
+def interactive_console(bw_client):
     sl_client = SLClient()
 
     print("Interactive mode started.")
@@ -33,16 +30,9 @@ def interactive_console():
         else:
             print(f"Unknown command: {user_input}")
 
-    return bw_client
 
-
-def main():
-    return interactive_console()
-
-
-if __name__ == "__main__":
-    bw_client = main()
-
+def cleanup_bw_client(bw_client):
+    """Cleanup function to lock and logout from Bitwarden."""
     if bw_client:
         lock_err = None
         logout_err = None
@@ -61,3 +51,22 @@ if __name__ == "__main__":
             print(f"Cleanup: lock failed: {lock_err}")
         if logout_err:
             print(f"Cleanup: logout failed: {logout_err}")
+
+
+def main():
+    bw_client = None
+    try:
+        bw_client = BWClient()
+        bw_client.login()
+        bw_client.unlock()
+        interactive_console(bw_client)
+    except KeyboardInterrupt:
+        print("\nKeyboard interrupt received. Cleaning up...")
+    finally:
+        cleanup_bw_client(bw_client)
+    
+    return bw_client
+
+
+if __name__ == "__main__":
+    main()
