@@ -7,6 +7,9 @@ env_loaded_and_validated = False
 def load_and_validate_env() -> None:
     global env_loaded_and_validated
 
+    if env_loaded_and_validated:
+        return
+
     load_dotenv()
     values = dotenv_values()
 
@@ -25,13 +28,8 @@ def load_and_validate_env() -> None:
 
 def get_sl_api_key() -> str:
     if not env_loaded_and_validated:
-        raise RuntimeError(
-            "Environment not initialized. "
-            "Call load_and_validate_env() first."
-        )
+        load_and_validate_env()
 
     value = os.getenv("SL_APIKEY")
-    if not value:
-        raise RuntimeError("SL_APIKEY not available after validation")
 
     return value
