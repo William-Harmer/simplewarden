@@ -1,4 +1,5 @@
 import requests
+from collections import Counter
 from env import get_sl_api_key, load_and_validate_env
 
 class SLClient:
@@ -11,10 +12,10 @@ class SLClient:
             SLClient.SL_APIKEY = get_sl_api_key()
             SLClient._initialized = True
 
-        self._emails: list[str] | None = None
+        self._emails: Counter[str] | None = None
 
-    def create_list_of_alias_emails(self) -> None:
-        emails: list[str] = []
+    def create_counter_of_alias_emails(self) -> None:
+        emails: Counter[str] = Counter()
         page = 0
 
         while True:
@@ -31,7 +32,7 @@ class SLClient:
                 break
 
             for alias in aliases:
-                emails.append(alias["email"])
+                emails[alias["email"]] += 1
 
             page += 1
 
@@ -42,9 +43,9 @@ class SLClient:
         self._emails = None
 
     @property
-    def emails(self) -> list[str]:
+    def emails(self) -> Counter[str]:
         if self._emails is None:
             raise RuntimeError(
-                "Emails not loaded. Call create_list_of_alias_emails() first."
+                "Emails not loaded. Call create_counter_of_alias_emails() first."
             )
         return self._emails

@@ -17,7 +17,7 @@ def interactive_console(bw_client):
         elif user_input == "":
             continue
         elif user_input == "sllist":
-            sl_client.create_list_of_alias_emails()
+            sl_client.create_counter_of_alias_emails()
             for email in sl_client.emails:
                 print(email)
             sl_client.clear_emails()
