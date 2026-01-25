@@ -22,11 +22,10 @@ def interactive_console(bw_client):
                 print(email)
             sl_client.clear_emails()
         elif user_input == "bwlist":
-            logins = bw_client.create_list_of_logins()
-            for login in logins:
-                print("-" * 40)
-                for value in login.values():
-                    print(value)
+            bw_client.create_counter_of_usernames()
+            for username in bw_client.usernames:
+                print(username)
+            bw_client.clear_usernames()
         else:
             print(f"Unknown command: {user_input}")
 

@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+from collections import Counter
 from config import BW_CLI
 from env import load_and_validate_env
 
@@ -9,6 +10,7 @@ class BWClient:
 
     def __init__(self):
         load_and_validate_env()
+        self._usernames: Counter[str] | None = None
 
     def get_status(self) -> str:
         _result = subprocess.run([BW_CLI, "status"], text=True, capture_output=True, check=True)
@@ -44,7 +46,10 @@ class BWClient:
             stdout=subprocess.PIPE,
             check=True,
         )
-        os.environ["BW_SESSION"] = _result.stdout
+
+        # Strip actually needed
+        session_key = _result.stdout.strip()
+        os.environ["BW_SESSION"] = session_key
         print("Vault unlocked.")
     
     
@@ -57,25 +62,55 @@ class BWClient:
         else:
             subprocess.run([BW_CLI, "lock"], check=True)
 
-    def create_list_of_logins(self):
-        _result = subprocess.run(
-            [BW_CLI, "list", "items"],
-            text=True,
-            capture_output=True,
-            check=True
-        )
+    def create_counter_of_usernames(self) -> None:
+        status = self.get_status()
+        
+        if status != "unlocked":
+            self.unlock()
+            status = self.get_status()
+            if status != "unlocked":
+                raise RuntimeError(f"Cannot proceed: vault is not unlocked (status: {status})")
+        
+        try:
+            _result = subprocess.run(
+                [BW_CLI, "list", "items"],
+                text=True,
+                capture_output=True,
+                check=True,
+                timeout=30
+            )
+        except subprocess.TimeoutExpired:
+            print("ERROR: Subprocess timed out after 30 seconds")
+            raise
+        except subprocess.CalledProcessError as e:
+            print(f"ERROR: Subprocess failed with return code {e.returncode}")
+            print(f"stdout: {e.stdout}")
+            print(f"stderr: {e.stderr}")
+            raise
+        except Exception as e:
+            print(f"ERROR: Unexpected error: {type(e).__name__}: {e}")
+            raise
 
         items = json.loads(_result.stdout)
 
-        _results = []
+        usernames: Counter[str] = Counter()
 
         for item in items:
             login = item.get("login") or {}
+            username = login.get("username")
+            if username:
+                usernames[username] += 1
 
-            _results.append({
-                "username": login.get("username"),
-                "uris": login.get("uris"),
-                "password": login.get("password"),
-            })
+        # Assign only after fully built
+        self._usernames = usernames
 
-        return _results
+    def clear_usernames(self) -> None:
+        self._usernames = None
+
+    @property
+    def usernames(self) -> Counter[str]:
+        if self._usernames is None:
+            raise RuntimeError(
+                "Usernames not loaded. Call create_counter_of_usernames() first."
+            )
+        return self._usernames
