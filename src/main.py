@@ -26,6 +26,13 @@ def interactive_console(bw_client):
             for username in bw_client.usernames:
                 print(username)
             bw_client.clear_usernames()
+        elif user_input == "bwsllist":
+            bw_client.create_counter_of_usernames()
+            bw_client.create_counter_of_slemails()
+            for email in bw_client.slemails:
+                print(email)
+            bw_client.clear_slemails()
+            bw_client.clear_usernames()
         else:
             print(f"Unknown command: {user_input}")
 

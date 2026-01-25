@@ -11,6 +11,7 @@ class BWClient:
     def __init__(self):
         load_and_validate_env()
         self._usernames: Counter[str] | None = None
+        self._slemails: Counter[str] | None = None
 
     def get_status(self) -> str:
         _result = subprocess.run([BW_CLI, "status"], text=True, capture_output=True, check=True)
@@ -107,6 +108,23 @@ class BWClient:
     def clear_usernames(self) -> None:
         self._usernames = None
 
+    def create_counter_of_slemails(self) -> None:
+        if self._usernames is None:
+            raise RuntimeError(
+                "Usernames not loaded. Call create_counter_of_usernames() first."
+            )
+        
+        slemails: Counter[str] = Counter()
+        
+        for username in self._usernames:
+            if username.endswith("@simplelogin.com"):
+                slemails[username] = self._usernames[username]
+        
+        self._slemails = slemails
+
+    def clear_slemails(self) -> None:
+        self._slemails = None
+
     @property
     def usernames(self) -> Counter[str]:
         if self._usernames is None:
@@ -114,3 +132,11 @@ class BWClient:
                 "Usernames not loaded. Call create_counter_of_usernames() first."
             )
         return self._usernames
+
+    @property
+    def slemails(self) -> Counter[str]:
+        if self._slemails is None:
+            raise RuntimeError(
+                "SLEmails not loaded. Call create_counter_of_slemails() first."
+            )
+        return self._slemails
