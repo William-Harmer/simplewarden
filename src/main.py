@@ -1,6 +1,38 @@
 from SLClient import SLClient
 from BWClient import BWClient
 from env import get_sl_api_key
+from collections import Counter
+
+
+def compare_aliases(sl_emails: Counter[str], bw_sl_emails: Counter[str]) -> dict:
+    missing_in_bw = []
+    missing_in_sl = []
+    
+    # Get all unique emails from both lists
+    all_emails = set(sl_emails.keys()) | set(bw_sl_emails.keys())
+    
+    for email in all_emails:
+        sl_count = sl_emails.get(email, 0)
+        bw_count = bw_sl_emails.get(email, 0)
+        
+        if sl_count > bw_count:
+            # SL has more entries than BW - problem is in BW
+            missing_in_bw.append(email)
+        elif bw_count > sl_count:
+            # BW has more entries than SL - problem is in SL (BW has extras)
+            missing_in_sl.append(email)
+        elif sl_count == 0 and bw_count > 0:
+            # Email is in BW but not in SL
+            missing_in_sl.append(email)
+        elif bw_count == 0 and sl_count > 0:
+            # Email is in SL but not in BW
+            missing_in_bw.append(email)
+        # If counts match and both > 0, no problem - don't add to either list
+    
+    return {
+        'missing_in_bw': missing_in_bw,
+        'missing_in_sl': missing_in_sl
+    }
 
 
 def interactive_console(bw_client):
@@ -8,6 +40,8 @@ def interactive_console(bw_client):
 
     print("Interactive mode started.")
     print("Type 'logout' to log out and exit.")
+    print("Type 'lock' to lock the Bitwarden vault.")
+    print("Type 'unlock' to unlock the Bitwarden vault.")
 
     while True:
         user_input = input("> ").strip().lower()
@@ -33,6 +67,45 @@ def interactive_console(bw_client):
                 print(email)
             bw_client.clear_slemails()
             bw_client.clear_usernames()
+        elif user_input == "compare":
+            # Load both lists
+            sl_client.create_counter_of_alias_emails()
+            bw_client.create_counter_of_usernames()
+            bw_client.create_counter_of_slemails()
+            
+            # Compare them
+            differences = compare_aliases(sl_client.emails, bw_client.slemails)
+            
+            # Display results
+            if differences['missing_in_bw']:
+                print("\nMissing in Bitwarden:")
+                for email in differences['missing_in_bw']:
+                    print(email)
+            
+            if differences['missing_in_sl']:
+                print("\nMissing in SimpleLogin:")
+                for email in differences['missing_in_sl']:
+                    print(email)
+            
+            if not differences['missing_in_bw'] and not differences['missing_in_sl']:
+                print("\nPerfect match!")
+            
+            print()
+            
+            # Cleanup
+            sl_client.clear_emails()
+            bw_client.clear_slemails()
+            bw_client.clear_usernames()
+        elif user_input == "lock":
+            try:
+                bw_client.lock()
+            except Exception as e:
+                print(f"Error locking vault: {e}")
+        elif user_input == "unlock":
+            try:
+                bw_client.unlock()
+            except Exception as e:
+                print(f"Error unlocking vault: {e}")
         else:
             print(f"Unknown command: {user_input}")
 
