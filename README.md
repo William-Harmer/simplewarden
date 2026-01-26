@@ -1,14 +1,18 @@
 # SimpleWarden
-> **Status:** Ongoing - project just started.
+> **Status:** In Development
 
 SimpleWarden combines [Bitwarden](https://bitwarden.com/) and [SimpleLogin](https://simplelogin.io/) to ensure that email aliases stored on both platforms are always synced across both services.
 
-## Upcoming Features
-- **Alias Syncing:** Automatically compare and sync email aliases between Bitwarden and SimpleLogin.
-- **Alias Audit Report:** Generate a summary of missing, outdated, or mismatched aliases.
-- **Two-Way Updates:** Option to update Bitwarden entries from SimpleLogin or vice versa.
-- **Command-Line Interface (CLI):** Interact with SimpleWarden directly from the terminal for quick checks and sync operations.
-- **Interactive Setup:** Guided setup to link your SimpleLogin and Bitwarden vault securely.
-- **Logging & Reports:** Create local logs or export alias audit results for review.
+## Complete Features
+- **Alias Comparison:** Compares aliases from both services and identifies mismatched aliases.
+- **Interactive Console:** A command-line interface that enables users to list aliases from both services, compare them to identify discrepancies, and manage the Bitwarden vault (lock, unlock, sync, check status). This initial implementation represents the foundation for future enhancements.
 
-More ideas and improvements will be added as development continues.
+## Ongoing Features
+- **Interactive Console Enhancements:** Currently developing additional features and functionality for the interactive console.
+
+## Upcoming Features
+- **Interactive Setup:** Guided setup process to securely link SimpleLogin and Bitwarden vaults.
+- **Graphical User Interface:** A GUI implementation to provide an alternative to command-line interaction.
+- **Alias Creation:** Ability to create aliases from SimpleWarden itself, which are then synced to both services.
+
+Additional features and improvements will be added as development progresses.
