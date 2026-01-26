@@ -56,30 +56,30 @@ def interactive_console(bw_client):
         elif user_input == "":
             continue
         elif user_input == "sllist":
-            sl_client.create_counter_of_alias_emails()
+            sl_client.create_emails()
             for email in sl_client.emails:
                 print(email)
             sl_client.clear_emails()
         elif user_input == "bwlist":
-            bw_client.create_counter_of_usernames()
+            bw_client.create_usernames()
             for username in bw_client.usernames:
                 print(username)
             bw_client.clear_usernames()
         elif user_input == "bwsllist":
-            bw_client.create_counter_of_usernames()
-            bw_client.create_counter_of_slemails()
-            for email in bw_client.slemails:
+            bw_client.create_usernames()
+            bw_client.create_sl_emails()
+            for email in bw_client.sl_emails:
                 print(email)
-            bw_client.clear_slemails()
+            bw_client.clear_sl_emails()
             bw_client.clear_usernames()
         elif user_input == "compare":
             # Load both lists
-            sl_client.create_counter_of_alias_emails()
-            bw_client.create_counter_of_usernames()
-            bw_client.create_counter_of_slemails()
+            sl_client.create_emails()
+            bw_client.create_usernames()
+            bw_client.create_sl_emails()
             
             # Compare them
-            differences = compare_aliases(sl_client.emails, bw_client.slemails)
+            differences = compare_aliases(sl_client.emails, bw_client.sl_emails)
             
             # Display results
             if differences['missing_in_bw']:
@@ -99,7 +99,7 @@ def interactive_console(bw_client):
             
             # Cleanup
             sl_client.clear_emails()
-            bw_client.clear_slemails()
+            bw_client.clear_sl_emails()
             bw_client.clear_usernames()
         elif user_input == "lock":
             bw_client.lock()

@@ -14,7 +14,7 @@ class SLClient:
 
         self._emails: Counter[str] | None = None
 
-    def create_counter_of_alias_emails(self) -> None:
+    def create_emails(self) -> None:
         emails: Counter[str] = Counter()
         page = 0
 
@@ -46,6 +46,6 @@ class SLClient:
     def emails(self) -> Counter[str]:
         if self._emails is None:
             raise RuntimeError(
-                "Emails not loaded. Call create_counter_of_alias_emails() first."
+                "Emails not loaded. Call create_emails() first."
             )
         return self._emails

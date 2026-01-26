@@ -11,7 +11,7 @@ class BWClient:
     def __init__(self):
         load_and_validate_env()
         self._usernames: Counter[str] | None = None
-        self._slemails: Counter[str] | None = None
+        self._sl_emails: Counter[str] | None = None
 
     def get_status(self) -> str:
         try:
@@ -120,7 +120,7 @@ class BWClient:
             print(f"Error syncing vault: {e}")
             raise
 
-    def create_counter_of_usernames(self) -> None:
+    def create_usernames(self) -> None:
         status = self.get_status()
         
         if status != "unlocked":
@@ -165,35 +165,35 @@ class BWClient:
     def clear_usernames(self) -> None:
         self._usernames = None
 
-    def create_counter_of_slemails(self) -> None:
+    def create_sl_emails(self) -> None:
         if self._usernames is None:
             raise RuntimeError(
-                "Usernames not loaded. Call create_counter_of_usernames() first."
+                "Usernames not loaded. Call create_usernames() first."
             )
         
-        slemails: Counter[str] = Counter()
+        sl_emails: Counter[str] = Counter()
         
         for username in self._usernames:
             if username.endswith("@simplelogin.com"):
-                slemails[username] = self._usernames[username]
+                sl_emails[username] = self._usernames[username]
         
-        self._slemails = slemails
+        self._sl_emails = sl_emails
 
-    def clear_slemails(self) -> None:
-        self._slemails = None
+    def clear_sl_emails(self) -> None:
+        self._sl_emails = None
 
     @property
     def usernames(self) -> Counter[str]:
         if self._usernames is None:
             raise RuntimeError(
-                "Usernames not loaded. Call create_counter_of_usernames() first."
+                "Usernames not loaded. Call create_usernames() first."
             )
         return self._usernames
 
     @property
-    def slemails(self) -> Counter[str]:
-        if self._slemails is None:
+    def sl_emails(self) -> Counter[str]:
+        if self._sl_emails is None:
             raise RuntimeError(
-                "SLEmails not loaded. Call create_counter_of_slemails() first."
+                "SLEmails not loaded. Call create_sl_emails() first."
             )
-        return self._slemails
+        return self._sl_emails
