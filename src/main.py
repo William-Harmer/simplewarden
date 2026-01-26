@@ -42,6 +42,11 @@ def interactive_console(bw_client):
     print("Type 'logout' to log out and exit.")
     print("Type 'lock' to lock the Bitwarden vault.")
     print("Type 'unlock' to unlock the Bitwarden vault.")
+    print("Type 'sync' to sync the Bitwarden vault.")
+    print("Type 'sllist' to list all SimpleLogin alias emails.")
+    print("Type 'bwlist' to list all Bitwarden usernames.")
+    print("Type 'bwsllist' to list all SimpleLogin emails in Bitwarden.")
+    print("Type 'compare' to compare SimpleLogin and Bitwarden aliases.")
 
     while True:
         user_input = input("> ").strip().lower()
@@ -97,15 +102,11 @@ def interactive_console(bw_client):
             bw_client.clear_slemails()
             bw_client.clear_usernames()
         elif user_input == "lock":
-            try:
-                bw_client.lock()
-            except Exception as e:
-                print(f"Error locking vault: {e}")
+            bw_client.lock()
         elif user_input == "unlock":
-            try:
-                bw_client.unlock()
-            except Exception as e:
-                print(f"Error unlocking vault: {e}")
+            bw_client.unlock()
+        elif user_input == "sync":
+            bw_client.sync()
         else:
             print(f"Unknown command: {user_input}")
 
@@ -113,23 +114,14 @@ def interactive_console(bw_client):
 def cleanup_bw_client(bw_client):
     """Cleanup function to lock and logout from Bitwarden."""
     if bw_client:
-        lock_err = None
-        logout_err = None
-
         try:
             bw_client.lock()
-        except Exception as e:
-            lock_err = e
-
+        except Exception:
+            pass  # Error already printed by BWClient
         try:
             bw_client.logout()
-        except Exception as e:
-            logout_err = e
-
-        if lock_err:
-            print(f"Cleanup: lock failed: {lock_err}")
-        if logout_err:
-            print(f"Cleanup: logout failed: {logout_err}")
+        except Exception:
+            pass  # Error already printed by BWClient
 
 
 def main():

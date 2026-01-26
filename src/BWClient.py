@@ -14,18 +14,44 @@ class BWClient:
         self._slemails: Counter[str] | None = None
 
     def get_status(self) -> str:
-        _result = subprocess.run([BW_CLI, "status"], text=True, capture_output=True, check=True)
-        return json.loads(_result.stdout)["status"]  # unauthenticated | locked | unlocked
+        try:
+            _result = subprocess.run([BW_CLI, "status"], text=True, capture_output=True, check=True)
+            return json.loads(_result.stdout)["status"]  # unauthenticated | locked | unlocked
+        except subprocess.CalledProcessError as e:
+            print(f"Error getting status: {e}")
+            raise
+        except json.JSONDecodeError as e:
+            print(f"Error parsing status JSON: {e}")
+            raise
+        except Exception as e:
+            print(f"Error getting status: {e}")
+            raise
     
     def logout(self) -> None:
         if self.get_status() == "unauthenticated":
             print("Already logged out")
         else:
-            subprocess.run([BW_CLI, "logout"], check=True)
+            try:
+                subprocess.run([BW_CLI, "logout"], check=True)
+                print("Logged out successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Error logging out: {e}")
+                raise
+            except Exception as e:
+                print(f"Error logging out: {e}")
+                raise
 
     def login(self) -> None:
         if self.get_status() == "unauthenticated":
-            subprocess.run([BW_CLI, "login", "--apikey"], check=True)
+            try:
+                subprocess.run([BW_CLI, "login", "--apikey"], check=True)
+                print("Logged in successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Error logging in: {e}")
+                raise
+            except Exception as e:
+                print(f"Error logging in: {e}")
+                raise
         else:
             print("You are already logged in.")
 
@@ -41,17 +67,24 @@ class BWClient:
             return
 
         # status == "locked"
-        _result = subprocess.run(
-            [BW_CLI, "unlock", "--raw"],
-            text=True,
-            stdout=subprocess.PIPE,
-            check=True,
-        )
+        try:
+            _result = subprocess.run(
+                [BW_CLI, "unlock", "--raw"],
+                text=True,
+                stdout=subprocess.PIPE,
+                check=True,
+            )
 
-        # Strip actually needed
-        session_key = _result.stdout.strip()
-        os.environ["BW_SESSION"] = session_key
-        print("Vault unlocked.")
+            # Strip actually needed
+            session_key = _result.stdout.strip()
+            os.environ["BW_SESSION"] = session_key
+            print("Vault unlocked.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error unlocking vault: {e}")
+            raise
+        except Exception as e:
+            print(f"Error unlocking vault: {e}")
+            raise
     
     
     def lock(self) -> None:
@@ -61,7 +94,31 @@ class BWClient:
         elif _status == "locked":
             print("Your vault is already locked.")
         else:
-            subprocess.run([BW_CLI, "lock"], check=True)
+            try:
+                subprocess.run([BW_CLI, "lock"], check=True)
+                print("Vault locked successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Error locking vault: {e}")
+                raise
+            except Exception as e:
+                print(f"Error locking vault: {e}")
+                raise
+
+    def sync(self) -> None:
+        _status = self.get_status()
+        if _status == "unauthenticated":
+            print("You are not logged in and so you cannot sync your vault.")
+            return
+        
+        try:
+            subprocess.run([BW_CLI, "sync"], check=True)
+            print("Vault synced successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error syncing vault: {e}")
+            raise
+        except Exception as e:
+            print(f"Error syncing vault: {e}")
+            raise
 
     def create_counter_of_usernames(self) -> None:
         status = self.get_status()
