@@ -36,7 +36,6 @@ class SLClient:
 
             page += 1
 
-        # Assign only after fully built
         self._emails = emails
 
     def clear_emails(self):

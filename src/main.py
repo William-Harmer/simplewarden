@@ -8,7 +8,6 @@ def compare_aliases(sl_emails: Counter[str], bw_sl_emails: Counter[str]) -> dict
     missing_in_bw = []
     missing_in_sl = []
     
-    # Get all unique emails from both lists
     all_emails = set(sl_emails.keys()) | set(bw_sl_emails.keys())
     
     for email in all_emails:
@@ -16,18 +15,13 @@ def compare_aliases(sl_emails: Counter[str], bw_sl_emails: Counter[str]) -> dict
         bw_count = bw_sl_emails.get(email, 0)
         
         if sl_count > bw_count:
-            # SL has more entries than BW - problem is in BW
             missing_in_bw.append(email)
         elif bw_count > sl_count:
-            # BW has more entries than SL - problem is in SL (BW has extras)
             missing_in_sl.append(email)
         elif sl_count == 0 and bw_count > 0:
-            # Email is in BW but not in SL
             missing_in_sl.append(email)
         elif bw_count == 0 and sl_count > 0:
-            # Email is in SL but not in BW
             missing_in_bw.append(email)
-        # If counts match and both > 0, no problem - don't add to either list
     
     return {
         'missing_in_bw': missing_in_bw,
@@ -74,15 +68,12 @@ def interactive_console(bw_client):
             bw_client.clear_sl_emails()
             bw_client.clear_usernames()
         elif user_input == "compare":
-            # Load both lists
             sl_client.create_emails()
             bw_client.create_usernames()
             bw_client.create_sl_emails()
             
-            # Compare them
             differences = compare_aliases(sl_client.emails, bw_client.sl_emails)
             
-            # Display results
             if differences['missing_in_bw']:
                 print("\nMissing in Bitwarden:")
                 for email in differences['missing_in_bw']:
@@ -98,7 +89,6 @@ def interactive_console(bw_client):
             
             print()
             
-            # Cleanup
             sl_client.clear_emails()
             bw_client.clear_sl_emails()
             bw_client.clear_usernames()
@@ -115,16 +105,15 @@ def interactive_console(bw_client):
 
 
 def cleanup_bw_client(bw_client):
-    """Cleanup function to lock and logout from Bitwarden."""
     if bw_client:
         try:
             bw_client.lock()
         except Exception:
-            pass  # Error already printed by BWClient
+            pass
         try:
             bw_client.logout()
         except Exception:
-            pass  # Error already printed by BWClient
+            pass
 
 
 def main():

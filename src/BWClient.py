@@ -16,7 +16,7 @@ class BWClient:
     def get_status(self) -> str:
         try:
             _result = subprocess.run([BW_CLI, "status"], text=True, capture_output=True, check=True)
-            return json.loads(_result.stdout)["status"]  # unauthenticated | locked | unlocked
+            return json.loads(_result.stdout)["status"]
         except subprocess.CalledProcessError as e:
             print(f"Error getting status: {e}")
             raise
@@ -32,7 +32,7 @@ class BWClient:
             print("Already logged out")
         else:
             try:
-                subprocess.run([BW_CLI, "logout"], check=True)
+                subprocess.run([BW_CLI, "logout"], capture_output=True, check=True)
                 print("Logged out successfully.")
             except subprocess.CalledProcessError as e:
                 print(f"Error logging out: {e}")
@@ -44,7 +44,7 @@ class BWClient:
     def login(self) -> None:
         if self.get_status() == "unauthenticated":
             try:
-                subprocess.run([BW_CLI, "login", "--apikey"], check=True)
+                subprocess.run([BW_CLI, "login", "--apikey"], capture_output=True, check=True)
                 print("Logged in successfully.")
             except subprocess.CalledProcessError as e:
                 print(f"Error logging in: {e}")
@@ -66,7 +66,6 @@ class BWClient:
             print("Your vault is already unlocked.")
             return
 
-        # status == "locked"
         try:
             _result = subprocess.run(
                 [BW_CLI, "unlock", "--raw"],
@@ -75,7 +74,6 @@ class BWClient:
                 check=True,
             )
 
-            # Strip actually needed
             session_key = _result.stdout.strip()
             os.environ["BW_SESSION"] = session_key
             print("Vault unlocked.")
@@ -95,7 +93,7 @@ class BWClient:
             print("Your vault is already locked.")
         else:
             try:
-                subprocess.run([BW_CLI, "lock"], check=True)
+                subprocess.run([BW_CLI, "lock"], capture_output=True, check=True)
                 print("Vault locked successfully.")
             except subprocess.CalledProcessError as e:
                 print(f"Error locking vault: {e}")
@@ -111,7 +109,7 @@ class BWClient:
             return
         
         try:
-            subprocess.run([BW_CLI, "sync"], check=True)
+            subprocess.run([BW_CLI, "sync"], capture_output=True, check=True)
             print("Vault synced successfully.")
         except subprocess.CalledProcessError as e:
             print(f"Error syncing vault: {e}")
@@ -159,7 +157,6 @@ class BWClient:
             if username:
                 usernames[username] += 1
 
-        # Assign only after fully built
         self._usernames = usernames
 
     def clear_usernames(self) -> None:
