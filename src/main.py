@@ -43,6 +43,7 @@ def interactive_console(bw_client):
     print("Type 'lock' to lock the Bitwarden vault.")
     print("Type 'unlock' to unlock the Bitwarden vault.")
     print("Type 'sync' to sync the Bitwarden vault.")
+    print("Type 'bwstatus' to print the Bitwarden vault status.")
     print("Type 'sllist' to list all SimpleLogin alias emails.")
     print("Type 'bwlist' to list all Bitwarden usernames.")
     print("Type 'bwsllist' to list all SimpleLogin emails in Bitwarden.")
@@ -107,6 +108,8 @@ def interactive_console(bw_client):
             bw_client.unlock()
         elif user_input == "sync":
             bw_client.sync()
+        elif user_input == "bwstatus":
+            print(bw_client.get_status())
         else:
             print(f"Unknown command: {user_input}")
 
