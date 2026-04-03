@@ -1,4 +1,4 @@
-.venv/
+venv/
 .env
 tools/
 
@@ -7,3 +7,4 @@ __pycache__/
 .vscode/
 
 todo
+.DS_Store
