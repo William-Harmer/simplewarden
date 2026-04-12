@@ -5,10 +5,10 @@ SimpleWarden combines [Bitwarden](https://bitwarden.com/) and [SimpleLogin](http
 
 ## Complete Features
 - **Alias Comparison:** Compares aliases from both services and identifies mismatched aliases.
-- **Interactive Console:** A command-line interface that enables users to list aliases from both services, compare them to identify discrepancies, and manage the Bitwarden vault (lock, unlock, sync, check status). This initial implementation represents the foundation for future enhancements.
+- **Command-Line Interface:** A command-line interface that enables users to list aliases from both services, compare them to identify discrepancies, and manage the Bitwarden vault (lock, unlock, sync, check status). This initial implementation represents the foundation for future enhancements.
 
 ## Ongoing Features
-- **Interactive Console Enhancements:** Currently developing additional features and functionality for the interactive console.
+- **CLI Enhancements:** Currently developing additional features and functionality for the interactive console.
 
 ## Upcoming Features
 - **Interactive Setup:** Guided setup process to securely link SimpleLogin and Bitwarden vaults.
